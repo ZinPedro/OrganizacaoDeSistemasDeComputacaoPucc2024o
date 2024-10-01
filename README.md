@@ -29,3 +29,7 @@ LAB06{
     Lab06_01.ASM: Implementar um programa em assembly que leia n caracteres enquanto for diferente de CR. Contar o número de caracteres e imprimir tantos “*” quanto for este número.
     Lab06_02.ASM: Implementar um programa em assembly que leia n caracteres até que leia CR. Contar o número de caracteres e imprimir tantos “*” quanto for este número.
 }
+
+LAB07{
+    
+}
