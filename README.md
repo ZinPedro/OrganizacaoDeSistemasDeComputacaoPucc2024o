@@ -31,5 +31,7 @@ LAB06{
 }
 
 LAB07{
-    
+    Lab07_01.ASM: Implementar um programa em assembly que realize a divisão inteira entre dois números (de 0 a 9) por meio de subtrações sucessivas e exiba como resultado o quocientE e o resto da divisão.
+    Lab07_02.ASM: Implementar um programa em assembly que realize a multiplicação entre dois números (de 0 a 9) por meio de somas sucessivas e exiba o resultado da multiplicação. 
+    OBS – O programa deve ser comentado. Suponha que as entradas não gerarão um produto com 2 dígitos.
 }

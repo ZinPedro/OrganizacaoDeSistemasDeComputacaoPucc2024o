@@ -3,25 +3,25 @@ TITLE While
 .STACK 100H
 .CODE
     MAIN PROC 
-        MOV AH,01
+        MOV AH,01   ;FUNÇÃO PARA LER UM CARACTERE
         WHILE:
-            INT 21H
+            INT 21H     ;LE O CARACTERE E ARMAZENA EM AL
         
-            CMP AL,13
-            JE EXITWHILE
+            CMP AL,13       ;COMPARA O CARACTERE COM 13 (ENTER(ASCII)), SE FOR IGUAL SAI DO WHILE
+            JE EXITWHILE    
 
-            INC CL
-            JMP WHILE
+            INC CL  ;INCREMENTE CL (CONTADOR DE CARACTERES DIGITADOS ANTES DO ENTER
+            JMP WHILE   ;VOLTA PARA WHILE
         ;
         EXITWHILE:
-        MOV AH,02
+        MOV AH,02   ;FUNÇÃO PARA IMPRIMIR UM CARACTERE (DL)
         ASTERISC:
-            MOV DL,42
-            INT 21H
+            MOV DL,42   ;VALOR DE DL IGUAL A 42 (ASTERISCO(ASCII))
+            INT 21H     ;IMPRIME UM ASTERISCO A MENOS DO QUE FOI DIGITADO
 
             LOOP ASTERISC
         ;
-        MOV AH,4Ch
+        MOV AH,4Ch  ;ENCERRA O PROGRAMA
         INT 21H
     MAIN ENDP
 END MAIN
