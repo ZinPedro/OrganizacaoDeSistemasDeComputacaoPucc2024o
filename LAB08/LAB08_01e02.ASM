@@ -1,0 +1,60 @@
+TITLE ENTRADA DE_BINARIOS
+.MODEL SMALL
+.STACK 100H
+.DATA
+    MSG1 DB 'Digite o numero binario (apenas 0s e 1s) : $'
+    MSG2 DB 10,13,'O numero digitado foi: $'
+.CODE
+    MAIN PROC 
+        MOV AX,@DATA
+        MOV DS,AX
+
+        MOV AH,9
+        LEA DX,MSG1         ;IMPRIME MSG1
+        INT 21H
+
+        MOV AH,01           ;MOVE PARA FUNÇÃO QUE DETECTA CARACTERE DIGITADO E SALVA EM AL
+        MOV CX,16           ;COLOCA O VALOR 16 EM CX PARA REALIZAR O LOOP 16 VEZES
+
+
+        WHILE_:
+            INT 21H         ;DETECTA CARACTERE DIGITADO E SALVA EM AL
+
+            CMP AL,13       ;DETECTA SE A TECLA DIGITADA FOI O ENTER, SE SIM, SAI DO LOOP
+            JE EXIT_WHILE
+
+            ROL BX,1        ;ROLA OS BITS DE BX UMA CASA PARA ESQUERDA
+            AND AL,01H      ;FILTRA AL (CASO O USUARIO NAO TENHA DIGITADO NEM UM NEM 0 O CODIGO NAO BUGAR(PODE SER QUE O RESULTADO FINAL DE ERRADO))
+
+            OR BL,AL        ;SOMA O VALOR DE AL EM BL
+ 
+            LOOP WHILE_     ;RETORNA A WHILE_ ATE QUE CX SEJA 0
+        ;
+        EXIT_WHILE:
+            MOV AH,09       
+            LEA DX,MSG2     ;IMPRIME MSG2
+            INT 21H
+
+            ROL BX,1        ;ROLA OS BITS DE BX UMA CASA PARA ESQUERDA
+            
+            MOV AH,02       ;MOVE PARA FUNÇÃO QUE IMPRIME O VALOR DE DL
+            MOV CX,16       ;COLOCA O VALOR 16 EM CX PARA REALIZAR O LOOP 16 VEZES
+        IMPRIME:
+            TEST BX,0001H   ;ZERA TODOS OS BITS DE BX COM EXCEÇÃO DO LSB PARA SABER SE O LSB É 0 OU 1
+            JZ ZERO         ;SE A ZERO FLAG ATIVAR JUMP PARA ZERO 
+            MOV DL,31H      ;COLOCA O VALOR 31H (VALOR DO 1 NA TABELA ASCII)
+            JMP SALTO       ;PULA PARA SALTO
+            ZERO:
+            MOV DL,30H      ;COLOCA O VALOR 30H (VALOR DO 0 NA TABELA ASCII)
+            SALTO:
+            INT 21H         ;IMPRIME O NUMERO CORRESPONDENTE NO LSB
+            ROL BX,1        ;ROLA OS BITS DE BX UMA CASA PARA ESQUERDA
+            LOOP IMPRIME    ;RETORNA AO IMPRIME ATE QUE CX SEJA 0
+        ;
+        MOV AH,4Ch
+        INT 21H
+        MAIN ENDP
+            END MAIN
+
+
+
