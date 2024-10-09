@@ -43,21 +43,21 @@ TITLE ENTRADA DE_BINARIOS
             LEA DX,MSG2             ;IMPRIME MSG2
             INT 21H
             
-            MOV AH,02
-            MOV CX,4
+            MOV AH,02               ;MOVE PARA FUNÇÃO QUE IMPRIME O CARACTERE COM O VALOR EM DL
+            MOV CX,4                ;COLOCA O VALOR 4 EM CX PARA REALIZAR O LOOP 4 VEZES
         IMPRIME:
-            MOV DL,BH
-            SHR DL,4
-            CMP DL,09H
-            JG LETRA_IMPRIME
-            OR DL,30H
-            JMP SALTO2
+            MOV DL,BH               ;COLOCA O VALOR DE BH EM DL
+            SHR DL,4                ;FILTRA DL PARA FICA SO COM O VALOR DO CARACTERE MAIS SIGNIFICATIVO DO JUMERO HEXADECIMAL
+            CMP DL,09H              ;COMPARA DL COM 09H, PARA SABER SE EH UM NUMERO OU LETRA
+            JG LETRA_IMPRIME        ;SE FOR LETRA, PULA PARA LETRA_IMPRIME
+            OR DL,30H               ;COLOCA O VALOR DE 3 NOS 4 PRIMEIROS BITS, PARA FILTRAR O NUMERO, DE NUMERO PARA CARACTERE NUMERICO
+            JMP SALTO2              ;PULA PARA SALTO2
             LETRA_IMPRIME:
-            ADD DL,55
+            ADD DL,55               ;SOMA 55 A DL PARA TRANSFORMARA LETRA HEXADECIMAL EM CARACTERE
         SALTO2:
-            INT 21H
-            ROL BX,4
-            LOOP IMPRIME
+            INT 21H.                ;IMPRIME O CARACTERE COM VALOR EM DL
+            ROL BX,4.               ;ROLA OS BITS DE BX QUATRO CASAS PARA ESQUERDA
+            LOOP IMPRIME.           ;;VOLTA PARA IMPRIME ATE QUE CX SEJA 0
         ;
         MOV AH,4Ch
         INT 21H
