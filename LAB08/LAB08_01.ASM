@@ -22,16 +22,20 @@ TITLE ENTRADA DE_BINARIOS
 
             CMP AL,13
             JE EXIT_WHILE
+
+            ROL BX,1
             AND AL,01H
 
             OR BL,AL
-            ROL BX,1
+ 
             LOOP WHILE_
         ;
         EXIT_WHILE:
             MOV AH,09
             LEA DX,MSG2
             INT 21H
+
+            ROL BX,1
             
             MOV AH,02
             MOV CX,16
