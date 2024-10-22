@@ -1,4 +1,4 @@
-# Organiza-oDeSistemasDeComputa-o
+# OrganizacaoDeSistemasDeComputacaoPUCC2024
 Códigos em Assembly(DOS) (arquivos .ASM(extenção do VSCode: MASM/TASM))
 
 LAB02{
@@ -34,4 +34,17 @@ LAB07{
     Lab07_01.ASM: Implementar um programa em assembly que realize a divisão inteira entre dois números (de 0 a 9) por meio de subtrações sucessivas e exiba como resultado o quocientE e o resto da divisão.
     Lab07_02.ASM: Implementar um programa em assembly que realize a multiplicação entre dois números (de 0 a 9) por meio de somas sucessivas e exiba o resultado da multiplicação. 
     OBS – O programa deve ser comentado. Suponha que as entradas não gerarão um produto com 2 dígitos.
+}
+
+LAB08{
+    LAB08_01e02.ASM: Entrada e saída de números Binários.
+    LAB08_03e04.ASM: Entrada e saída de números Hexadecimais.
+}
+
+LAB09{
+    Lab09_1a.ASM: Exemplo de código, copiar e comentar as funções.
+    Lab09_1b.ASM: Exemplo de código, copiar e comentar as funções.
+    Lab09_2a.ASM: Exemplo de código, copiar e comentar as funções.
+    Lab09_2b.ASM: Exemplo de código, copiar e comentar as funções.
+    Lab09_3.ASM:  Programa que inverta a ordem de um vetor de 7 posições
 }
