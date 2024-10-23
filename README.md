@@ -46,5 +46,5 @@ LAB09{
     Lab09_1b.ASM: Exemplo de código, copiar e comentar as funções.
     Lab09_2a.ASM: Exemplo de código, copiar e comentar as funções.
     Lab09_2b.ASM: Exemplo de código, copiar e comentar as funções.
-    Lab09_3.ASM:  Programa que inverta a ordem de um vetor de 7 posições
+    Lab09_3.ASM:  Ler, inverter e imprimir vetor de 7 posições.
 }
