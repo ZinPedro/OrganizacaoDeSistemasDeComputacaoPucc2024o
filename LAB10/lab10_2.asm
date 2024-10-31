@@ -4,17 +4,21 @@ TITLE Iniciais Do Nome
 
 ESPAÇO MACRO 
     PUSH AX
+    PUSH DX
     MOV AH,02 
     MOV DL,32
-    INT 21H 
+    INT 21H
+    POP DX 
     POP AX
 ENDM   
 
 PulaLinha MACRO 
     PUSH AX
+    PUSH DX
     MOV AH,02 
     MOV DL,10
     INT 21H
+    POP DX
     POP AX
 ENDM
 
@@ -60,16 +64,20 @@ ENDM
     MSG1 DB 'Digite o numero da Matriz (linha: $'
     MSG2 DB ', coluna: $'
     MSG3 DB '):',10,13,'$'
-    NPERM DB 10,13,'Este numero nao eh permitido!',10,13,'$'
+    NPERM DB 'Este numero nao eh permitido!',10,13,'$'
+    SOMAMSG DB 10,13,'A soma da matriz eh: $'
 .CODE
     MAIN PROC 
         MOV AX,@DATA
         MOV DS,AX
-
-        CALL LER 
-        PulaLinha 
-
-
+ 
+        CALL LER
+        PulaLinha
+        CALL IMPRIME  
+        CALL SOMA
+        CALL IMPSOMA
+         
+ 
         MOV AH,4Ch
         INT 21H
     MAIN ENDP
@@ -82,6 +90,7 @@ ENDM
 
         MOV CX,4
         MOV AH,01
+        XOR BX,BX 
         FORLER:
             XOR SI,SI
             PUSH CX
@@ -96,6 +105,8 @@ ENDM
                 CMP AL,30H
                 JB NPERMITIDO
 
+
+                AND AL,0FH
                 MOV MATRIZ[BX][SI],AL
                 INC SI
                 LOOP FORLER2
@@ -109,7 +120,7 @@ ENDM
             MOV AH,09
             LEA DX,NPERM
             INT 21H 
-            MOV AH,02
+            MOV AH,01
             JMP FORLER2
         ;
         LEREXIT:
@@ -125,9 +136,10 @@ ENDM
         PUSH BX
         PUSH DX
         PUSH CX
-
+ 
         MOV AH,2
         MOV CX,4
+        XOR DX,DX
 
         FORIMP:
             XOR SI,SI
@@ -160,7 +172,12 @@ ENDM
         PUSH BX
         PUSH CX
 
-        XOR AX,AX
+        MOV AH,09
+        LEA DX,SOMAMSG
+        INT 21H 
+
+        XOR AX,AX  
+        XOR BX,BX
         MOV CX,4
         FORSOMA:
             XOR SI,SI
@@ -192,6 +209,7 @@ ENDM
         XOR BH,BH
         MOV BL,10
         XOR DX,DX
+        XOR CX,CX
 
         CMP AX,9
         JA SAIDADECIMAL
@@ -214,8 +232,7 @@ ENDM
         ;
 
         EXITDECIMAL:
-        MOV AL,AH
-        XOR AH,AH
+        XCHG AH,AL
         PUSH AX 
         MOV AH,02
         INC CX
