@@ -60,18 +60,15 @@ ENDM
     MSG1 DB 'Digite o numero da Matriz (linha: $'
     MSG2 DB ', coluna: $'
     MSG3 DB '):',10,13,'$'
-    NPERM DB 'Este numero nao eh permitido!',10,13,'$'
+    NPERM DB 10,13,'Este numero nao eh permitido!',10,13,'$'
 .CODE
     MAIN PROC 
         MOV AX,@DATA
         MOV DS,AX
 
-        CALL LER
-        PulaLinha
-        CALL IMPRIME
-        CALL SOMA
-        PulaLinha
-        CALL IMPSOMA
+        CALL LER 
+        PulaLinha 
+
 
         MOV AH,4Ch
         INT 21H
@@ -93,7 +90,7 @@ ENDM
                 MENSAGEM
                 INT 21H
                 PulaLinha
-
+ 
                 CMP AL,36H
                 JA NPERMITIDO
                 CMP AL,30H
@@ -111,7 +108,8 @@ ENDM
         NPERMITIDO:
             MOV AH,09
             LEA DX,NPERM
-            INT 21H
+            INT 21H 
+            MOV AH,02
             JMP FORLER2
         ;
         LEREXIT:
@@ -188,55 +186,48 @@ ENDM
     IMPSOMA PROC
         PUSH BX
         PUSH CX
-        PUSH DX
+        PUSH DX 
+        PUSH AX 
 
+        XOR BH,BH
         MOV BL,10
-        PUSH AX;.
+        XOR DX,DX
+
+        CMP AX,9
+        JA SAIDADECIMAL
+
+        MOV AH,02
+        MOV DL,AL
+        INT 21H
+        JMP EXIT
+
         SAIDADECIMAL:
             DIV BL
             AND AL,AL
-            JZ EXIT
+            JZ EXITDECIMAL
 
-            MOV AL,AH
+            MOV DL,AH
+            PUSH DX 
             XOR AH,AH
             INC CX
             JMP SAIDADECIMAL
         ;
-        MOV CL,BH
-        AND CX,CX
-        JNZ SAIDADECIMAL2
 
-        POP BX ;.
-        MOV DL,BL
-        OR DL,30H
+        EXITDECIMAL:
+        MOV AL,AH
+        XOR AH,AH
+        PUSH AX 
         MOV AH,02
-        INT 21H
-        JMP PREEXIT
-
-        SAIDADECIMAL2:
-            DIV BL
-            XOR DH,DH
-            MOV DL,AL
-            PUSH DX
-
-            MOV AL,AH
-            XOR AH,AH
-        LOOP SAIDADECIMAL2
-        MOV CL,BH
-
+        INC CX
+ 
         SAIDADECIMAL3:
-            MOV AH,02
             POP DX
             OR DL,30H
             INT 21H
         LOOP SAIDADECIMAL3
-
-        POP AX;.
-        JMP EXIT
-        PREEXIT:
-        MOV AX,BX
-
+   
         EXIT:
+        POP AX
         POP DX
         POP CX
         POP BX
