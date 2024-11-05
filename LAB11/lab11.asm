@@ -67,10 +67,10 @@ ENDM
         IMPRIMEMSG HEX
 
         CALL ESCOLHA 
-        XOR AL,31H
-        JZ EBINARIO_
-        XOR AL,32H
-        JZ EDECIMAL_ 
+        CMP AL,31H
+        JE EBINARIO_
+        CMP AL,32H
+        JE EDECIMAL_ 
 
         CALL EHEXADECIMAL
         JMP EXIT_E
@@ -87,22 +87,22 @@ ENDM
         IMPRIMEMSG HEX
 
         CALL ESCOLHA
-        XOR AL,31H
-        JZ SBINARIO_
-        XOR AL,32H
-        JZ SDECIMAL_ 
+        CMP AL,31H
+        JE SBINARIO_
+        CMP AL,32H
+        JE SDECIMAL_ 
 
         CALL SHEXADECIMAL
         JMP EXIT_S
         SBINARIO_: 
         CALL SBINARIO
         JMP EXIT_S 
-        SDECIMAL_: 
+        SDECIMAL_:  
         CALL SDECIMAL
         EXIT_S:
 
-
-
+        MOV AH,4Ch
+        INT 21H 
     MAIN ENDP
 
     ESCOLHA PROC  
@@ -210,8 +210,7 @@ ENDM
         RET
     EBINARIO ENDP   
 
-    SBINARIO PROC 
-
+    SBINARIO PROC  
 
         IMPRIMEMSG SBIN
 
@@ -231,10 +230,10 @@ ENDM
             ROL BX,1        ;ROLA OS BITS DE BX UMA CASA PARA ESQUERDA
             LOOP IMPRIMEBIN    ;RETORNA AO IMPRIME ATE QUE CX SEJA 0
         ;
+        RET
     SBINARIO ENDP
 
     EDECIMAL PROC 
-        XOR DX,DX 
         IMPRIMEMSG EDECI 
 
         MOV BX,10
@@ -242,7 +241,9 @@ ENDM
         MOV AH,01 
         INT 21H
         CMP AL,2DH
-        JE NEGATIVO
+        JE NEGATIVO  
+        XOR DX,DX 
+        PUSH DX
         CMP AL,13 
         JE EXIT1_DECI
         AND AL,0FH
@@ -263,22 +264,68 @@ ENDM
             MUL BL 
             ADD DX,AX
         LOOP LOOP_DECI
-
+        JMP EXIT1_DECI
         NEGATIVO:
-            XOR AH,AH
+            MOV AX,1
             PUSH AX 
             JMP LOOP_DECI
-            
+
+        NEGAR:
+            NEG BX 
+            JMP EXIT2_DECI
+
+        NPERMITIDODECI:
+            IMPRIMEMSG NPERMITIDO
+            JMP LOOP_DECI 
+
         EXIT1_DECI:    
             MOV BX,DX
- 
+            POP AX 
+            OR AX,AX  
+            JNZ NEGAR
 
-
-
-
+        EXIT2_DECI:    
         RET 
     EDECIMAL ENDP    
 
+    SDECIMAL PROC 
+        IMPRIMEMSG SDECI 
+        XOR CX,CX
+
+        TEST BX,BX
+        JS NEGATIVODECIMAL
+        VOLTANEG:
+        MOV AX,BX
+        MOV BX,10 
+        IMPRIMEDECIMAL: 
+            XOR DX,DX
+            DIV BX  
+            PUSH DX 
+            INC CX
+            TEST AX,AX
+            JZ EXITLOOP  
+            JMP IMPRIMEDECIMAL
+        ;
+
+        NEGATIVODECIMAL:
+        MOV AH,02
+        MOV DL,2DH
+        INT 21H
+
+        NEG BX
+        JMP VOLTANEG
+
+        EXITLOOP:
+        MOV AH,02
+        IMPRIMEDECIMAL2: 
+        POP DX 
+        OR DL,30H
+        INT 21H
+             
+        LOOP IMPRIMEDECIMAL2
+
+        RET    
+    SDECIMAL ENDP    
 END MAIN
 
 
