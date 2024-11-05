@@ -48,3 +48,16 @@ LAB09{
     Lab09_2b.ASM: Exemplo de código, copiar e comentar as funções.
     Lab09_3.ASM:  Ler, inverter e imprimir vetor de 7 posições.
 }
+
+LAB10 {
+    lab10_1.ASM: Faça um programa que imprima a matriz abaixo, como uma matriz (linhas e colunas). Usar procedimentos e macros.
+    MATRIZ4X4 DB 1,2,3,4
+              DB 4,3,2,1
+              DB 5,6,7,8
+              DB 8,7,6,5
+    lab10_2.ASM: Escreva um programa que leia todos os elementos de uma matriz 4 X 4 de números inteiros entre 0 e 6, inclusive. O programa deverá ler a matriz, imprimir a matriz lida, fazer a soma dos elementos, armazenar e imprimir esta soma.           
+}
+
+LAB11 { 
+    lab11.ASM: Fazer um programa que permita a entrada e qualquer uma das bases e a saída em qualquer uma das bases. O programa deverá perguntar em que base será a entrada do número e em que base será a saída do número. 
+}
