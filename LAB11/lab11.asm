@@ -169,7 +169,7 @@ ENDM
             MOV DL,BH               ;COLOCA O VALOR DE BH EM DL
             SHR DL,4                ;FILTRA DL PARA FICA SO COM O VALOR DO CARACTERE MAIS SIGNIFICATIVO DO NUMERO HEXADECIMAL
             CMP DL,09H              ;COMPARA DL COM 09H, PARA SABER SE EH UM NUMERO OU LETRA
-            JG LETRA_IMPRIME        ;SE FOR LETRA, PULA PARA LETRA_IMPRIME
+            JA LETRA_IMPRIME        ;SE FOR LETRA, PULA PARA LETRA_IMPRIME
             OR DL,30H               ;COLOCA O VALOR DE 3 NOS 4 PRIMEIROS BITS, PARA FILTRAR O NUMERO, DE NUMERO PARA CARACTERE NUMERICO
             JMP SALTO2              ;PULA PARA SALTO2
             LETRA_IMPRIME:
@@ -293,8 +293,13 @@ ENDM
         XOR CX,CX
 
         TEST BX,BX
-        JS NEGATIVODECIMAL
-        VOLTANEG:
+            JNS NNEG
+            MOV AH,02
+            MOV DL,2DH
+            INT 21H
+
+            NEG BX
+        NNEG:
         MOV AX,BX
         MOV BX,10 
         IMPRIMEDECIMAL: 
@@ -306,14 +311,6 @@ ENDM
             JZ EXITLOOP  
             JMP IMPRIMEDECIMAL
         ;
-
-        NEGATIVODECIMAL:
-        MOV AH,02
-        MOV DL,2DH
-        INT 21H
-
-        NEG BX
-        JMP VOLTANEG
 
         EXITLOOP:
         MOV AH,02
