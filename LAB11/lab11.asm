@@ -308,11 +308,8 @@ ENDM
             PUSH DX 
             INC CX
             TEST AX,AX
-            JZ EXITLOOP  
-            JMP IMPRIMEDECIMAL
+            JNZ IMPRIMEDECIMAL 
         ;
-
-        EXITLOOP:
         MOV AH,02
         IMPRIMEDECIMAL2: 
         POP DX 
