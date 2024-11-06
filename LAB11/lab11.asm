@@ -2,48 +2,52 @@ TITLE Entrada de Numeros
 .MODEL SMALL
 .STACK 100H
 
+; MACROS para salvar e restaurar os registradores principais
 PUSH_ALL MACRO
-    PUSH AX
-    PUSH BX
-    PUSH CX
-    PUSH DX
-    PUSH SI
-    PUSH DI 
+    PUSH AX             ; Salva o valor de AX na pilha
+    PUSH BX             ; Salva o valor de BX na pilha
+    PUSH CX             ; Salva o valor de CX na pilha
+    PUSH DX             ; Salva o valor de DX na pilha
+    PUSH SI             ; Salva o valor de SI na pilha
+    PUSH DI             ; Salva o valor de DI na pilha
 ENDM
 
 POP_ALL MACRO
-    POP DI
-    POP SI
-    POP DX
-    POP CX 
-    POP BX
-    POP AX
+    POP DI              ; Restaura o valor de DI da pilha
+    POP SI              ; Restaura o valor de SI da pilha
+    POP DX              ; Restaura o valor de DX da pilha
+    POP CX              ; Restaura o valor de CX da pilha
+    POP BX              ; Restaura o valor de BX da pilha
+    POP AX              ; Restaura o valor de AX da pilha
 ENDM
 
+; Macro para pular uma linha na tela
 PulaLinha MACRO 
-    PUSH_ALL
-    MOV AH,02 
-    MOV DL,10
-    INT 21H 
-    POP_ALL
+    PUSH_ALL            ; Salva todos os registradores antes de modificar
+    MOV AH,02           ; Função de saída de caractere de `INT 21H`
+    MOV DL,10           ; Código ASCII para salto de linha (newline)
+    INT 21H             ; Interrupção para executar a função
+    POP_ALL             ; Restaura os registradores para seu estado original
 ENDM
 
+; Macro para exibir uma mensagem
 IMPRIMEMSG MACRO MSG
-    PUSH_ALL
-    MOV AH,09
-    LEA DX,MSG
-    INT 21H
-    POP_ALL  
+    PUSH_ALL            ; Salva todos os registradores
+    MOV AH,09           ; Função de exibição de string de `INT 21H`
+    LEA DX,MSG          ; Carrega o endereço da mensagem em DX
+    INT 21H             ; Chama interrupção para exibir a string
+    POP_ALL             ; Restaura os registradores
 ENDM
 
+; Segmento de dados
 .DATA
     MSG1 DB 'Em que base sera a entrada do numero?',10,13,'$'
     MSG2 DB 10,13,'Em que base sera a saida do numero?',10,13,'$' 
     MSG4 DB 10,13,'O numero eh: $' 
 
     BIN DB '1 - Binario',10,13,'$'
-    DECI  DB '2 - Decimal',10,13,'$'
-    HEX  DB '3 - Hexadecimal',10,13,'$'
+    DECI DB '2 - Decimal',10,13,'$'
+    HEX DB '3 - Hexadecimal',10,13,'$'
 
     EHEXA DB 10,13,'Digite o numero hexadecimal (de 0 a F) : $'
     SHEXA DB 10,13,'O numero digitado, em hexadecimal, eh: $'
@@ -56,75 +60,89 @@ ENDM
  
     NPERMITIDO DB 10,13,'Esta nao e uma escolha possivel! Tente novamente: ',10,13,'$'
 
+; Segmento de código
 .CODE
     MAIN PROC
-        MOV AX,@DATA
-        MOV DS,AX
+        MOV AX,@DATA        ; Carrega o endereço do segmento de dados em AX
+        MOV DS,AX           ; Define DS como o segmento de dados
 
+        ; Exibe as opções para a base de entrada
         IMPRIMEMSG MSG1
         IMPRIMEMSG BIN
         IMPRIMEMSG DECI
         IMPRIMEMSG HEX
 
+        ; Lê a escolha do usuário para a base de entrada
         CALL ESCOLHA 
-        CMP AL,31H
+        CMP AL,31H          ; Verifica se o usuário escolheu '1' (binário)
         JE EBINARIO_
-        CMP AL,32H
+        CMP AL,32H          ; Verifica se o usuário escolheu '2' (decimal)
         JE EDECIMAL_ 
 
+        ; Caso o usuário escolha hexadecimal
         CALL EHEXADECIMAL
-        JMP EXIT_E
+        JMP EXIT_E          ; Salta para o fim da escolha da base de entrada
+
         EBINARIO_:
-        CALL EBINARIO
-        JMP EXIT_E 
+        CALL EBINARIO       ; Chama a rotina para a entrada em binário
+        JMP EXIT_E          ; Salta para o fim da escolha da base de entrada
+
         EDECIMAL_:
-        CALL EDECIMAL 
+        CALL EDECIMAL       ; Chama a rotina para a entrada em decimal
         EXIT_E:
 
+        ; Exibe as opções para a base de saída
         IMPRIMEMSG MSG2
         IMPRIMEMSG BIN
         IMPRIMEMSG DECI
         IMPRIMEMSG HEX
 
+        ; Lê a escolha do usuário para a base de saída
         CALL ESCOLHA
-        CMP AL,31H
+        CMP AL,31H          ; Verifica se o usuário escolheu '1' (binário)
         JE SBINARIO_
-        CMP AL,32H
+        CMP AL,32H          ; Verifica se o usuário escolheu '2' (decimal)
         JE SDECIMAL_ 
 
+        ; Caso o usuário escolha hexadecimal para saída
         CALL SHEXADECIMAL
-        JMP EXIT_S
+        JMP EXIT_S          ; Salta para o fim da escolha da base de saída
+
         SBINARIO_: 
-        CALL SBINARIO
-        JMP EXIT_S 
+        CALL SBINARIO       ; Chama a rotina para a saída em binário
+        JMP EXIT_S          ; Salta para o fim da escolha da base de saída
+
         SDECIMAL_:  
-        CALL SDECIMAL
+        CALL SDECIMAL       ; Chama a rotina para a saída em decimal
         EXIT_S:
 
-        MOV AH,4Ch
-        INT 21H 
+        ; Finaliza o programa
+        MOV AH,4Ch          ; Função de saída do DOS
+        INT 21H             ; Interrupção para encerrar o programa
     MAIN ENDP
 
+
     ESCOLHA PROC  
-        PUSH DX
-        ESCOLHER:
-            MOV AH,01
-            INT 21H 
+        PUSH DX               ; Salva o valor do registrador DX na pilha para preservar seu valor durante a execução do procedimento ESCOLHA.
+        ESCOLHER:             ; Label (marcador) para o início do loop de seleção.
 
-            CMP AL,31H
-            JB N_PERMITIDO
-            CMP AL,33H
-            JA N_PERMITIDO
+            MOV AH,01         ; Configura a função de leitura de caractere do teclado sem eco para o DOS (INT 21h, função 01).
+            INT 21H           ; Interrupção de sistema para ler um caractere do teclado. O caractere digitado será armazenado em AL.
 
-            POP DX
-            RET
+            CMP AL,31H        ; Compara o valor lido em AL com '1' (ASCII 31h).
+            JB N_PERMITIDO    ; Se AL for menor que '1', salta para o rótulo N_PERMITIDO, indicando uma escolha inválida.
+            CMP AL,33H        ; Compara o valor lido em AL com '3' (ASCII 33h).
+            JA N_PERMITIDO    ; Se AL for maior que '3', salta para o rótulo N_PERMITIDO, indicando uma escolha inválida.
 
-        N_PERMITIDO:
-            IMPRIMEMSG NPERMITIDO
-            JMP ESCOLHER
-        ; 
+            POP DX            ; Restaura o valor original de DX que foi salvo na pilha.
+            RET               ; Retorna para o chamador com AL contendo a escolha válida do usuário.
 
-    ESCOLHA ENDP  
+        N_PERMITIDO:          ; Rótulo para tratar uma entrada inválida do usuário.
+            IMPRIMEMSG NPERMITIDO ; Chama a macro IMPRIMEMSG para exibir a mensagem de erro (entrada não permitida).
+            JMP ESCOLHER          ; Retorna para o início do loop ESCOLHER para solicitar uma nova entrada do usuário.
+
+    ESCOLHA ENDP             ; Fim do procedimento ESCOLHA.
+ 
 
     EHEXADECIMAL PROC   
         XOR AX,AX
@@ -233,93 +251,109 @@ ENDM
         RET
     SBINARIO ENDP
 
-    EDECIMAL PROC 
-        IMPRIMEMSG EDECI 
+    EDECIMAL PROC
+        IMPRIMEMSG EDECI         ; Exibe a mensagem solicitando que o usuário digite um número decimal (0-9).
 
-        MOV BX,10
-        MOV CX,4
-        MOV AH,01 
-        INT 21H
-        CMP AL,2DH
-        JE NEGATIVO  
-        XOR DX,DX 
-        PUSH DX
-        CMP AL,13 
-        JE EXIT1_DECI
-        AND AL,0FH
-        MOV DL,AL
-        DEC CX
-        LOOP_DECI: 
-            MOV AH,01 
-            INT 21H 
-            CMP AL,13 
-            JE EXIT1_DECI 
-            CMP AL,30H 
-            JB NPERMITIDODECI
-            CMP AL,39H
-            JA NPERMITIDODECI
-            AND AL,0FH
-            XOR AH,AH  
-            XCHG DX,AX 
-            MUL BL 
-            ADD DX,AX
-        LOOP LOOP_DECI
-        JMP EXIT1_DECI
-        NEGATIVO:
-            MOV AX,1
-            PUSH AX 
-            JMP LOOP_DECI
+        MOV BX,10                ; Define a base 10 (decimal) para as operações de multiplicação.
+        MOV CX,4                 ; Define um limite de 4 dígitos para o número decimal.
+        MOV AH,01                ; Configura a função de leitura de caractere do teclado (INT 21h, função 01).
+        INT 21H                  ; Interrupção para ler o primeiro caractere do teclado. O valor será armazenado em AL.
 
-        NEGAR:
-            NEG BX 
-            JMP EXIT2_DECI
+        CMP AL,2DH               ; Verifica se o caractere lido é o símbolo de menos ('-' para números negativos).
+        JE NEGATIVO              ; Se for '-', pula para o rótulo NEGATIVO para tratar o número como negativo.
 
-        NPERMITIDODECI:
-            IMPRIMEMSG NPERMITIDO
-            JMP LOOP_DECI 
+        XOR DX,DX                ; Limpa DX, que será usado para armazenar o valor decimal acumulado.
+        PUSH DX                  ; Salva o valor atual de DX na pilha.
+        CMP AL,13                ; Verifica se o caractere é 'Enter' (valor ASCII 13).
+        JE EXIT1_DECI            ; Se for 'Enter', salta para o fim (o número digitado é zero ou vazio).
 
-        EXIT1_DECI:    
-            MOV BX,DX
-            POP AX 
-            OR AX,AX  
-            JNZ NEGAR
+        AND AL,0FH               ; Converte o dígito ASCII para seu valor numérico (0-9).
+        MOV DL,AL                ; Armazena o primeiro dígito convertido em DL.
+        DEC CX                   ; Decrementa o contador de dígitos (CX) para refletir o primeiro dígito lido.
 
-        EXIT2_DECI:    
-        RET 
-    EDECIMAL ENDP    
+        LOOP_DECI:               ; Início do loop para processar cada dígito adicional.
+            MOV AH,01            ; Configura novamente a função de leitura de caractere.
+            INT 21H              ; Lê o próximo caractere.
+            CMP AL,13            ; Verifica se o caractere é 'Enter'.
+            JE EXIT1_DECI        ; Se for 'Enter', salta para o final.
 
-    SDECIMAL PROC 
-        IMPRIMEMSG SDECI 
-        XOR CX,CX
+            CMP AL,30H           ; Verifica se o caractere é menor que '0'.
+            JB NPERMITIDODECI    ; Se for, salta para NPERMITIDODECI para tratar a entrada inválida.
+            CMP AL,39H           ; Verifica se o caractere é maior que '9'.
+            JA NPERMITIDODECI    ; Se for, salta para NPERMITIDODECI para tratar a entrada inválida.
 
-        TEST BX,BX
-            JNS NNEG
-            MOV AH,02
-            MOV DL,2DH
-            INT 21H
+            AND AL,0FH           ; Converte o dígito ASCII para valor numérico (0-9).
+            XOR AH,AH            ; Limpa o registrador AH.
+            XCHG DX,AX           ; Troca DX com AX para preparar para a multiplicação.
+            MUL BL               ; Multiplica o número acumulado em DX por 10 (BX) para "empurrar" o valor à esquerda.
+            ADD DX,AX            ; Adiciona o dígito atual ao valor acumulado em DX.
 
-            NEG BX
+        LOOP LOOP_DECI           ; Repete o loop enquanto CX (contador de dígitos) não chega a zero.
+
+        JMP EXIT1_DECI           ; Salta para o fim após o processamento completo dos dígitos.
+
+        NEGATIVO:                ; Rótulo para tratar números negativos.
+            MOV AX,1             ; Coloca 1 em AX como indicador de número negativo.
+            PUSH AX              ; Salva esse indicador na pilha.
+            JMP LOOP_DECI        ; Volta ao loop de processamento de dígitos.
+
+        NEGAR:                   ; Rótulo para inverter o sinal do número se for negativo.
+            NEG BX               ; Aplica a operação de negação em BX (torna o valor negativo).
+            JMP EXIT2_DECI       ; Salta para o fim do procedimento.
+
+        NPERMITIDODECI:          ; Rótulo para tratar entradas inválidas.
+            IMPRIMEMSG NPERMITIDO ; Exibe mensagem de erro para entrada inválida.
+            JMP LOOP_DECI        ; Retorna ao loop para solicitar uma nova entrada do usuário.
+
+        EXIT1_DECI:              ; Rótulo para o final do processamento dos dígitos.
+            MOV BX,DX            ; Move o valor acumulado em DX para BX.
+            POP AX               ; Recupera o valor da pilha (verifica se o número é negativo).
+            OR AX,AX             ; Verifica se o valor em AX é zero (número positivo).
+            JNZ NEGAR            ; Se AX não for zero, chama NEGAR para aplicar o sinal negativo.
+
+        EXIT2_DECI:              ; Rótulo final para sair do procedimento.
+            RET                  ; Retorna ao chamador com o valor decimal final em BX.
+    EDECIMAL ENDP
+   
+
+    SDECIMAL PROC
+        IMPRIMEMSG SDECI          ; Exibe a mensagem solicitando que o número decimal seja impresso.
+
+        XOR CX,CX                 ; Limpa CX, que será usado para contar os dígitos do número.
+
+        TEST BX,BX                ; Verifica o sinal do número em BX.
+            JNS NNEG              ; Se BX é positivo (sinal não é negativo), salta para NNEG.
+            MOV AH,02             ; Configura a função de saída de caractere (INT 21h, função 02) para exibir o sinal.
+            MOV DL,2DH            ; Define DL como o caractere '-' para o sinal negativo.
+            INT 21H               ; Interrupção para exibir o sinal '-' na tela.
+
+            NEG BX                ; Inverte o valor em BX para torná-lo positivo, já que o sinal foi exibido.
         NNEG:
-        MOV AX,BX
-        MOV BX,10 
-        IMPRIMEDECIMAL: 
-            XOR DX,DX
-            DIV BX  
-            PUSH DX 
-            INC CX
-            TEST AX,AX
-            JNZ IMPRIMEDECIMAL 
-        ;
-        MOV AH,02
-        IMPRIMEDECIMAL2: 
-        POP DX 
-        OR DL,30H
-        INT 21H
-             
-        LOOP IMPRIMEDECIMAL2
+        MOV AX,BX                 ; Move o valor positivo de BX para AX para preparação de divisão.
+        MOV BX,10                 ; Define a base decimal (10) para a divisão.
 
-        RET    
-    SDECIMAL ENDP    
+        IMPRIMEDECIMAL:           ; Rótulo para iniciar o loop de conversão dos dígitos.
+            XOR DX,DX             ; Limpa DX antes da divisão para evitar restos indesejados.
+            DIV BX                ; Divide AX por 10 (BX), deixando o quociente em AX e o resto (último dígito) em DX.
+            PUSH DX               ; Salva o dígito atual (resto) na pilha.
+            INC CX                ; Incrementa o contador de dígitos.
+            TEST AX,AX            ; Testa se o quociente é zero (se todos os dígitos foram processados).
+            JNZ IMPRIMEDECIMAL    ; Se não é zero, continua o loop para processar o próximo dígito.
+
+        ; Agora, todos os dígitos foram empilhados (último dígito no topo da pilha).
+
+        MOV AH,02                 ; Configura a função de saída de caractere (INT 21h, função 02) para exibir os dígitos.
+
+        IMPRIMEDECIMAL2:          ; Rótulo para o loop de impressão dos dígitos.
+            POP DX                ; Recupera o próximo dígito da pilha.
+            OR DL,30H             ; Converte o valor numérico do dígito para ASCII (adicionando 30h).
+            INT 21H               ; Interrupção para exibir o dígito na tela.
+
+        LOOP IMPRIMEDECIMAL2      ; Decrementa CX e repete o loop enquanto CX não é zero (exibe todos os dígitos).
+
+        RET                       ; Retorna ao chamador com o número exibido.
+    SDECIMAL ENDP
+   
 END MAIN
 
 
