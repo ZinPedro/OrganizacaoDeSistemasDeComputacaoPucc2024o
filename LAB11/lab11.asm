@@ -60,6 +60,8 @@ ENDM
  
     NPERMITIDO DB 10,13,'Esta nao e uma escolha possivel! Tente novamente: ',10,13,'$'
 
+    
+
 ; Segmento de código
 .CODE
     MAIN PROC
