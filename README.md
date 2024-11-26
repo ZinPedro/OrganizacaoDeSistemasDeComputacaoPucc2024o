@@ -74,7 +74,7 @@
 
 ## LAB12 
 ```
-    Lab12.ASMFazer um programa que (um procedimento para cada):
+    Lab12.ASM: Fazer um programa que (um procedimento para cada):
     1 – leia um string e armazene na memória e imprima o string lido
     2 – copie este sting em outro
     3 – compara o string lido com um já armazenado na memória e diga se são iguais ou não.
