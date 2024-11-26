@@ -37,24 +37,18 @@ IMPRIMEMSG MACRO MSG
     LEA DX,MSG          ; Carrega o endereço da mensagem em DX
     INT 21H             ; Chama interrupção para exibir a string
     POP_ALL             ; Restaura os registradores
-ENDM
-
-ZeraVetor MACRO VETOR  
-    PUSH_ALL 
-    LEA DI, VETOR
-    MOV AL,0
-    MOV CX,101
-    REP STOSB
-    POP_ALL 
-ENDM
-
-
+ENDM 
 
 ; Segmento de dados
 .DATA
-    MSG1 DB 'Qual eh o seu nome?',10,13,'$'
-    MSG2 DB 'Ola, $'
+    MSG1 DB 'Digite uma string?',10,13,'$' 
+    MSG2 DB 'A string digitada foi: $'
+    MSG3 DB 'A quantidade de "a" na string eh: $'
 
+    IGUAIS DB 'As duas frases sao iguais!',10,13,'$'
+    NAOIGUAIS DB 'As duas frases nao sao iguais!',10,13,'$'
+
+    REFERENCIA DB 'teste para identificar se eh igual ' 
 
     V1 DB 101 DUP(0)
     V2 DB 101 DUP(?)
@@ -64,19 +58,21 @@ ENDM
         MOV AX,@DATA 
         MOV DS,AX
         MOV ES,AX
-
-        CALL PROC1
-        CALL COPIA 
-        PulaLinha
-        ZeraVetor V1
+  
+        IMPRIMEMSG MSG1     ;Imprime MSG1
+        CALL PROC1          ;Lê, armazena e imprime string 
+        CALL COPIA          ;Copia vetor com string em outro vetor
+        PulaLinha           ;pula linha
+        CALL COMPARA        ;Compara string digitada com a sttring REFERENCIA
+        IMPRIMEMSG MSG3     ;Imprime MSG3
+        CALL LETRAA         ;Conta quantos 'a' foram digitados
 
         MOV AH,4Ch
         INT 21H
     MAIN ENDP
 
     PROC1 PROC 
-        PUSH_ALL
-        IMPRIMEMSG MSG1
+        PUSH_ALL 
 
         CLD
         LEA DI,V1
@@ -128,7 +124,90 @@ ENDM
     COPIA ENDP     
 
     COMPARA PROC 
+        PUSH_ALL
+        CLD 
+        LEA SI,V1
+        LEA DI,REFERENCIA
 
+        MOV CX,34
+
+        REP CMPSB
+        JZ STRINGIGUAIS 
+
+        IMPRIMEMSG NAOIGUAIS    
+        JMP EXIT_COMPARA
+
+        STRINGIGUAIS: 
+        IMPRIMEMSG IGUAIS
+
+        EXIT_COMPARA: 
+        POP_ALL
+        RET
     COMPARA ENDP
     
+    LETRAA PROC
+        PUSH_ALL
+
+        CLD
+        LEA DI,V1
+        MOV AL,'a'
+        MOV AH,02
+
+        XOR DX,DX
+        MOV CX,101
+
+        VOLTA: 
+            SCASB 
+            JNZ SKIP    
+            ADD DL,1
+            SKIP:
+        LOOP VOLTA
+
+        CMP DL,10
+        JB UMDIGITO
+
+        PUSH AX
+        PUSH DX
+
+        MOV BL,10 
+        XOR CX,CX
+        XOR AH,AH 
+
+        VERIFICADECIMAL:
+            MOV AL,DL
+ 
+            DIV BL
+ 
+            MOV DL,AL
+            MOV AL,AH
+            XOR AH,AH
+            PUSH AX  
+
+            INC CX
+
+            CMP DL,0
+            JE IMPRIMEDECIMAL
+
+        JMP VERIFICADECIMAL  
+
+        IMPRIMEDECIMAL:
+            MOV AH,2
+            LOOP_IMPRIMEDECIMAL:
+                POP DX 
+                OR DL,30H
+                INT 21H
+            LOOP LOOP_IMPRIMEDECIMAL 
+
+        POP DX 
+        POP AX 
+
+        JMP LETRAA_EXIT
+        UMDIGITO:
+            OR DL,30H   
+            INT 21H 
+
+        LETRAA_EXIT:
+        POP_ALL
+        RET
+    LETRAA ENDP    
 END MAIN
