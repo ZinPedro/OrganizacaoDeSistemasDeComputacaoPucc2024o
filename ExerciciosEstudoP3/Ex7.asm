@@ -1,4 +1,4 @@
-TITLE ex3
+TITLE ex7
 .MODEL SMALL
 .STACK 100H
 
@@ -41,37 +41,70 @@ ENDM
 
 ; Segmento de dados
 .DATA
-    MATRIZ DB 1,2
-           DB 3,4
+    VETOR DB 1,2,9,4,5
 
+    MSG1 DB 'Qual posicao voce quer tirar do vetor? (primeira posicao = 1, segunda = 2,...): $'
 .CODE
     MAIN PROC
         MOV AX,@DATA
-        MOV DS,AX 
+        MOV DS,AX
+        MOV ES,AX
 
-        MOV AL, MATRIZ [0][1]
-        XCHG MATRIZ [2][0],AL
-        MOV MATRIZ [0][1],AL
+        CALL IMPRIMEVETOR
+        PulaLinha
+        IMPRIMEMSG MSG1 
 
-        MOV AH,02
 
-        IMPRIME:
-            XOR SI,SI
-            MOV CX,2
-            IMPRIME2:
-                MOV DL,MATRIZ[BX][SI]
-                OR DL,30H
-                INC SI
-                INT 21H
-            LOOP IMPRIME2
-            PulaLinha
-            ADD BX,2
-            CMP BX,4
-            JL IMPRIME  
+        MOV AH,01
+        INT 21H
+        AND AL,0FH
+        DEC AL
 
+        XOR AH,AH
+    
+        CLD
+        LEA SI,VETOR
+        ADD SI,AX
+        LODSB
+        DEC SI
+        PUSH AX
+
+        LEA CX,VETOR+4
+        SUB CX,SI
+
+        MOV DI,SI
+        INC SI
+
+        REP MOVSB
+ 
+        MOV AL,0
+        STOSB
+
+        PulaLinha
+        CALL IMPRIMEVETOR
+
+        POP AX
 
         MOV AH,4Ch
-        INT 21H 
-    MAIN ENDP 
+        INT 21H
 
-END MAIN        
+    MAIN ENDP
+
+    IMPRIMEVETOR PROC
+        MOV AH,02
+        LEA SI,VETOR
+        MOV CX,5
+        IMPRIME_VETOR:
+            LODSB
+
+            OR AL,AL
+            JZ EXIT_VETOR
+
+            MOV DL,AL
+            OR DL,30H
+            INT 21H 
+        LOOP IMPRIME_VETOR
+        EXIT_VETOR:
+        RET
+    IMPRIMEVETOR ENDP
+END MAIN     

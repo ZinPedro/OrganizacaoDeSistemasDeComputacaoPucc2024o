@@ -1,4 +1,4 @@
-TITLE Entrada de Numeros 
+TITLE ex6
 .MODEL SMALL
 .STACK 100H
 
