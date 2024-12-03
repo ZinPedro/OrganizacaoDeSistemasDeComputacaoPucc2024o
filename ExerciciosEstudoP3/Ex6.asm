@@ -41,41 +41,56 @@ ENDM
 
 ; Segmento de dados
 .DATA
-    VETOR DB 19,17,13,15,16,18,16,15
+    VETOR1 DB 1,2,9,4,5,6,7
+    VETOR2 DB 1,2,9,4,9,6,7
 
-    MSG1 DB 'Existem $'   
-    MSG2 DB ' numeros maiores que 15 no vetor!$' 
+    MSG1 DB 'Os vetores tem $'
+    MSG2 DB ' elementos iguais, sao eles: $'
 .CODE
-    MAIN PROC 
+    MAIN PROC
         MOV AX,@DATA
         MOV DS,AX
         MOV ES,AX
 
-        CLD 
-        LEA DI,VETOR
+        STD
+        LEA SI,VETOR1+6
+        LEA DI,VETOR2+6
 
+        MOV CX,7    
+        XOR AX,AX
         XOR DX,DX
-        MOV CX,8
 
         COMPARA:
-        LODSB 
-        CMP AL,15
-        JBE VOLTA
-            INC DL
-        VOLTA:
+            CMPSB 
+            JNZ NIGUAL
+                INC SI
+                LODSB
+                PUSH AX
+                INC DX
+            NIGUAL:
         LOOP COMPARA
 
-        IMPRIMEMSG MSG1
-        
         MOV AH,02
+        MOV CX,DX
+        IMPRIMEMSG MSG1
         OR DL,30H
-        INT 21H 
-
+        INT 21H
         IMPRIMEMSG MSG2
+
+        IMPRIME_IGUAIS:
+            POP DX
+            OR DL,30H
+            INT 21H
+
+            MOV DL,','
+            INT 21H 
+
+            MOV DL,''
+            INT 21H
+        LOOP IMPRIME_IGUAIS
 
         MOV AH,4Ch
         INT 21H
 
-    MAIN ENDP
-
-END MAIN    
+    MAIN ENDP 
+END MAIN

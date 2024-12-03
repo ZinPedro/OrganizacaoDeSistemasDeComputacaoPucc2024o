@@ -41,41 +41,46 @@ ENDM
 
 ; Segmento de dados
 .DATA
-    VETOR DB 19,17,13,15,16,18,16,15
+    VETOR DB 1,2,3,4,5
 
-    MSG1 DB 'Existem $'   
-    MSG2 DB ' numeros maiores que 15 no vetor!$' 
 .CODE
-    MAIN PROC 
+    MAIN PROC
         MOV AX,@DATA
         MOV DS,AX
         MOV ES,AX
 
-        CLD 
-        LEA DI,VETOR
+        STD
 
-        XOR DX,DX
-        MOV CX,8
+        MOV CX,k    ;Trocar k pela quantidade de rotate do vetor
 
-        COMPARA:
-        LODSB 
-        CMP AL,15
-        JBE VOLTA
-            INC DL
-        VOLTA:
-        LOOP COMPARA
 
-        IMPRIMEMSG MSG1
-        
+        ROTATE:
+            MOV BL,VETOR[4]
+            LEA SI,VETOR+3
+            LEA DI,VETOR+4
+
+            PUSH CX
+            MOV CX,5
+
+            REP MOVSB
+
+            POP CX
+            MOV VETOR[0],BL
+        LOOP ROTATE
+
+        CLD
         MOV AH,02
-        OR DL,30H
-        INT 21H 
+        LEA SI,VETOR
+        MOV CX,5
 
-        IMPRIMEMSG MSG2
+        IMPRIME:
+            LODSB
+            MOV DL,AL
+            OR DL,30H
+            INT 21H 
+        LOOP IMPRIME
 
         MOV AH,4Ch
         INT 21H
-
     MAIN ENDP
-
-END MAIN    
+END MAIN

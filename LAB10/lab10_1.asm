@@ -46,7 +46,6 @@ MATRIZ  DB 1,2,3,4
 
         FOR:
             XOR SI,SI
-            PUSH CX
             MOV CX,4
             FOR2:
                 MOV DL,MATRIZ[BX][SI]

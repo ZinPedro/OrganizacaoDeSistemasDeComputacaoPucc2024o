@@ -41,41 +41,37 @@ ENDM
 
 ; Segmento de dados
 .DATA
-    VETOR DB 19,17,13,15,16,18,16,15
+    MATRIZ DB 1,2
+           DB 3,4
 
-    MSG1 DB 'Existem $'   
-    MSG2 DB ' numeros maiores que 15 no vetor!$' 
 .CODE
-    MAIN PROC 
+    MAIN PROC
         MOV AX,@DATA
-        MOV DS,AX
-        MOV ES,AX
+        MOV DS,AX 
 
-        CLD 
-        LEA DI,VETOR
+        MOV AL, MATRIZ [0][1]
+        XCHG MATRIZ [2][0],AL
+        MOV MATRIZ [0][1],AL
 
-        XOR DX,DX
-        MOV CX,8
-
-        COMPARA:
-        LODSB 
-        CMP AL,15
-        JBE VOLTA
-            INC DL
-        VOLTA:
-        LOOP COMPARA
-
-        IMPRIMEMSG MSG1
-        
         MOV AH,02
-        OR DL,30H
-        INT 21H 
 
-        IMPRIMEMSG MSG2
+        IMPRIME:
+            XOR SI,SI
+            MOV CX,2
+            IMPRIME2:
+                MOV DL,MATRIZ[BX][SI]
+                OR DL,30H
+                INC SI
+                INT 21H
+            LOOP IMPRIME2
+            PulaLinha
+            ADD BX,2
+            CMP BX,4
+            JL IMPRIME  
+
 
         MOV AH,4Ch
-        INT 21H
+        INT 21H 
+    MAIN ENDP 
 
-    MAIN ENDP
-
-END MAIN    
+END MAIN        
